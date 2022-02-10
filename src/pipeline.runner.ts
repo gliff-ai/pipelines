@@ -103,7 +103,9 @@ export class PipelineRunner {
             log.LogPipelineTriggerOutput(buildQueueResult);
             // If build result contains validation errors set result to FAILED
             if (buildQueueResult.validationResults != null && buildQueueResult.validationResults.length > 0) {
+                console.log(buildQueueResult.validationResults);
                 let errorAndWarningMessage = p.getErrorAndWarningMessageFromBuildResult(buildQueueResult.validationResults);
+                console.log(errorAndWarningMessage);
                 core.setFailed("Errors: " + errorAndWarningMessage.errorMessage + " Warnings: " + errorAndWarningMessage.warningMessage);
             }
             else {
