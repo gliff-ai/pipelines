@@ -95,10 +95,15 @@ export class PipelineRunner {
             parameters: this.taskParameters.azurePipelineVariables
         } as BuildInterfaces.Build;
 
+        core.info("1");
+        core.info(JSON.stringify(build));
+
         log.LogPipelineTriggerInput(build);
 
         // Queue build
         let buildQueueResult = await buildApi.queueBuild(build, build.project.id, true);
+        core.info("2");
+        core.info(JSON.stringify(buildQueueResult));
         if (buildQueueResult != null) {
             log.LogPipelineTriggerOutput(buildQueueResult);
             // If build result contains validation errors set result to FAILED
