@@ -31,12 +31,12 @@ export class PipelineRunner {
 
             let pipelineName = this.taskParameters.azurePipelineName;
             try {
-                core.debug(`Triggering Yaml pipeline : "${pipelineName}"`);
+                core.info(`Triggering Yaml pipeline : "${pipelineName}"`);
                 await this.RunYamlPipeline(webApi);
             }
             catch (error) {
                 if (error instanceof PipelineNotFoundError) {
-                    core.debug(`Triggering Designer pipeline : "${pipelineName}"`);
+                    core.info(`Triggering Designer pipeline : "${pipelineName}"`);
                     await this.RunDesignerPipeline(webApi);
                 } else {
                     throw error;
@@ -75,11 +75,11 @@ export class PipelineRunner {
 
         // If definition is linked to existing github repo, pass github source branch and source version to build
         if (p.equals(repositoryId, this.repository) && p.equals(repositoryType, this.githubRepo)) {
-            core.debug("pipeline is linked to same Github repo");
+            core.info("pipeline is linked to same Github repo");
             sourceBranch = this.branch,
                 sourceVersion = this.commitId
         } else {
-            core.debug("pipeline is not linked to same Github repo");
+            core.info("pipeline is not linked to same Github repo");
         }
 
         let build: BuildInterfaces.Build = {
@@ -103,9 +103,9 @@ export class PipelineRunner {
             log.LogPipelineTriggerOutput(buildQueueResult);
             // If build result contains validation errors set result to FAILED
             if (buildQueueResult.validationResults != null && buildQueueResult.validationResults.length > 0) {
-                console.log(buildQueueResult.validationResults);
+                core.info(JSON.stringify(buildQueueResult.validationResults));
                 let errorAndWarningMessage = p.getErrorAndWarningMessageFromBuildResult(buildQueueResult.validationResults);
-                console.log(errorAndWarningMessage);
+                core.info(JSON.stringify(errorAndWarningMessage));
                 core.setFailed("Errors: " + errorAndWarningMessage.errorMessage + " Warnings: " + errorAndWarningMessage.warningMessage);
             }
             else {
@@ -145,11 +145,11 @@ export class PipelineRunner {
         let artifacts: ReleaseInterfaces.ArtifactMetadata[] = new Array();
 
         if (gitHubArtifacts == null || gitHubArtifacts.length == 0) {
-            core.debug("Pipeline is not linked to any GitHub artifact");
+            core.info("Pipeline is not linked to any GitHub artifact");
             // If no GitHub artifacts found it means pipeline is not linked to any GitHub artifact
         } else {
             // If pipeline has any matching Github artifact
-            core.debug("Pipeline is linked to GitHub artifact. Looking for now matching repository");
+            core.info("Pipeline is linked to GitHub artifact. Looking for now matching repository");
             gitHubArtifacts.forEach(gitHubArtifact => {
                 if (gitHubArtifact.definitionReference != null && p.equals(gitHubArtifact.definitionReference.definition.name, this.repository)) {
                     // Add version information for matching GitHub artifact
@@ -163,7 +163,7 @@ export class PipelineRunner {
                             sourceVersion: this.commitId
                         }
                     }
-                    core.debug("pipeline is linked to same Github repo");
+                    core.info("pipeline is linked to same Github repo");
                     artifacts.push(artifactMetadata);
                 }
             });
